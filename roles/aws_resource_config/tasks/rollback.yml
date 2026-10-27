@@ -1,0 +1,33 @@
+---
+# Rollback configuration changes (using debug statements for demo)
+
+- name: Display rollback notice
+  ansible.builtin.debug:
+    msg:
+      - "=== Starting Configuration Rollback ==="
+      - "Reverting changes to instance: {{ aws_instance_id | default('N/A') }}"
+
+- name: Rollback configuration tasks
+  ansible.builtin.debug:
+    msg: "Rolling back: {{ item }}"
+  loop: "{{ config_tasks | reverse }}"
+  loop_control:
+    label: "{{ item }}"
+
+- name: Simulate rollback work
+  ansible.builtin.debug:
+    msg:
+      - "Configuration rollback completed"
+      - "In a real scenario, this would:"
+      - "  - Stop application services"
+      - "  - Remove deployed files"
+      - "  - Uninstall packages"
+      - "  - Restore previous configuration"
+      - "Note: Infrastructure will still be destroyed by workflow"
+
+- name: Rollback summary
+  ansible.builtin.debug:
+    msg:
+      - "=== Configuration Rollback Complete ==="
+      - "Local changes reverted"
+      - "Workflow will now trigger Terraform destroy for full rollback"

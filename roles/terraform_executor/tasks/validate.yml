@@ -1,0 +1,57 @@
+---
+# Validation tasks for terraform_executor role
+
+- name: Validate terraform_action is set
+  ansible.builtin.assert:
+    that:
+      - terraform_action is defined
+      - terraform_action in ['provision', 'destroy']
+    fail_msg: "terraform_action must be either 'provision' or 'destroy'"
+    success_msg: "Terraform action '{{ terraform_action }}' is valid"
+
+- name: Validate terraform_dir is set
+  ansible.builtin.assert:
+    that:
+      - terraform_dir is defined
+      - terraform_dir | length > 0
+    fail_msg: "terraform_dir must be defined and non-empty"
+    success_msg: "Terraform directory is set to '{{ terraform_dir }}'"
+
+- name: Check if Terraform directory exists
+  ansible.builtin.stat:
+    path: "{{ terraform_dir }}"
+  register: tf_dir_stat
+
+- name: Validate Terraform directory exists
+  ansible.builtin.assert:
+    that:
+      - tf_dir_stat.stat.exists
+      - tf_dir_stat.stat.isdir
+    fail_msg: "Terraform directory does not exist: {{ terraform_dir }}"
+    success_msg: "Terraform directory exists: {{ terraform_dir }}"
+
+- name: Check for Terraform configuration files
+  ansible.builtin.find:
+    paths: "{{ terraform_dir }}"
+    patterns: "*.tf"
+  register: tf_files
+
+- name: Validate Terraform files exist
+  ansible.builtin.assert:
+    that:
+      - tf_files.files | length > 0
+    fail_msg: "No Terraform (.tf) files found in {{ terraform_dir }}"
+    success_msg: "Found {{ tf_files.files | length }} Terraform file(s)"
+
+- name: Validate Terraform binary exists
+  ansible.builtin.command: which {{ terraform_binary }}
+  register: tf_binary_check
+  changed_when: false
+  failed_when: false
+
+- name: Assert Terraform binary is available
+  ansible.builtin.assert:
+    that:
+      - tf_binary_check.rc == 0
+    fail_msg: "Terraform binary not found: {{ terraform_binary }}"
+    success_msg: "Terraform binary found: {{ tf_binary_check.stdout }}"

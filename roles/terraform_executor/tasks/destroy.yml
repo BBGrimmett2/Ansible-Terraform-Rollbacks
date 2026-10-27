@@ -1,0 +1,79 @@
+---
+# Terraform destroy tasks (rollback)
+
+- name: Destroy infrastructure with Terraform
+  block:
+    - name: Initialize Terraform for destroy
+      ansible.builtin.command:
+        cmd: "{{ terraform_binary }} init"
+        chdir: "{{ terraform_dir }}"
+      register: tf_init_destroy
+      changed_when: "'Terraform has been successfully initialized' in tf_init_destroy.stdout"
+
+    - name: Display Terraform init output
+      ansible.builtin.debug:
+        var: tf_init_destroy.stdout_lines
+
+    - name: Select Terraform workspace
+      ansible.builtin.command:
+        cmd: "{{ terraform_binary }} workspace select {{ terraform_workspace }}"
+        chdir: "{{ terraform_dir }}"
+      register: tf_workspace_destroy
+      changed_when: false
+      failed_when: false
+
+    - name: Check if state file exists
+      ansible.builtin.stat:
+        path: "{{ terraform_dir }}/terraform.tfstate"
+      register: tf_state_file
+
+    - name: Display rollback notice
+      ansible.builtin.debug:
+        msg:
+          - "ROLLBACK: Destroying all provisioned infrastructure"
+          - "This will remove all AWS resources created by Terraform"
+      when: tf_state_file.stat.exists
+
+    - name: Build Terraform destroy command
+      ansible.builtin.set_fact:
+        tf_destroy_cmd: >-
+          {{ terraform_binary }} destroy
+          {% if terraform_auto_approve %}-auto-approve{% endif %}
+          {% if terraform_var_file | length > 0 %}-var-file={{ terraform_var_file }}{% endif %}
+          {% for key, value in terraform_extra_vars.items() %}-var '{{ key }}={{ value }}'{% if not loop.last %} {% endif %}{% endfor %}
+
+    - name: Execute Terraform destroy
+      ansible.builtin.command:
+        cmd: "{{ tf_destroy_cmd }}"
+        chdir: "{{ terraform_dir }}"
+      register: tf_destroy
+      changed_when: "'Destroy complete!' in tf_destroy.stdout"
+      when: tf_state_file.stat.exists
+
+    - name: Display Terraform destroy output
+      ansible.builtin.debug:
+        var: tf_destroy.stdout_lines
+      when: tf_state_file.stat.exists
+
+    - name: Confirm rollback completion
+      ansible.builtin.debug:
+        msg:
+          - "ROLLBACK COMPLETE: All infrastructure destroyed"
+          - "Environment returned to pre-provision state"
+      when: tf_state_file.stat.exists and tf_destroy.changed
+
+    - name: No infrastructure to destroy
+      ansible.builtin.debug:
+        msg: "No Terraform state file found - nothing to destroy"
+      when: not tf_state_file.stat.exists
+
+  rescue:
+    - name: Display Terraform destroy failure
+      ansible.builtin.debug:
+        msg:
+          - "WARNING: Terraform destroy encountered an error"
+          - "Manual cleanup of AWS resources may be required"
+
+    - name: Fail with destroy error
+      ansible.builtin.fail:
+        msg: "Terraform destroy failed. Check AWS console for orphaned resources."

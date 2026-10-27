@@ -1,0 +1,77 @@
+---
+# Argument specs for terraform_executor role
+argument_specs:
+  main:
+    short_description: Execute Terraform operations (provision or destroy)
+    description:
+      - Executes Terraform init, plan, and apply/destroy operations
+      - Supports failure simulation for demo purposes
+      - Handles Terraform state management with local backend
+
+    options:
+      terraform_action:
+        type: str
+        required: true
+        choices:
+          - provision
+          - destroy
+        description: Terraform action to perform
+
+      terraform_dir:
+        type: path
+        required: true
+        description: Directory containing Terraform configuration files
+
+      terraform_var_file:
+        type: str
+        required: false
+        description: Path to Terraform tfvars file (optional)
+
+      terraform_extra_vars:
+        type: dict
+        required: false
+        description: Dictionary of extra variables to pass to Terraform
+
+      terraform_binary:
+        type: str
+        required: false
+        description: Path to Terraform binary
+
+      terraform_auto_approve:
+        type: bool
+        required: false
+        description: Auto-approve Terraform changes without prompting
+
+      terraform_workspace:
+        type: str
+        required: false
+        description: Terraform workspace to use
+
+  provision:
+    short_description: Provision infrastructure with Terraform
+    description:
+      - Executes terraform init, plan, and apply
+      - Creates VPC, Subnet, Security Group, and EC2 instance
+
+    options:
+      terraform_dir:
+        type: path
+        required: true
+        description: Directory containing Terraform configuration files
+
+      terraform_extra_vars:
+        type: dict
+        required: false
+        description: Dictionary of extra variables (e.g., simulate_tf_failure)
+
+  destroy:
+    short_description: Destroy infrastructure with Terraform (rollback)
+    description:
+      - Executes terraform init and destroy
+      - Removes all provisioned AWS resources
+
+    options:
+      terraform_dir:
+        type: path
+        required: true
+        description: Directory containing Terraform configuration files

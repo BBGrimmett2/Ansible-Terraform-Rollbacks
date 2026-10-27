@@ -1,0 +1,23 @@
+---
+# Defaults for terraform_executor role
+
+# Terraform action to perform: provision | destroy
+terraform_action: provision
+
+# Directory containing Terraform files
+terraform_dir: "{{ playbook_dir }}/../terraform"
+
+# Optional tfvars file path
+terraform_var_file: ""
+
+# Extra variables to pass to Terraform as -var flags
+terraform_extra_vars: {}
+
+# Terraform binary path (default assumes it's in PATH)
+terraform_binary: terraform
+
+# Terraform auto-approve flag
+terraform_auto_approve: true
+
+# Terraform workspace (default workspace)
+terraform_workspace: default

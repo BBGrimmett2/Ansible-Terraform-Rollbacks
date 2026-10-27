@@ -1,0 +1,13 @@
+---
+# Main orchestration tasks for terraform_executor role
+
+- name: Validate inputs
+  ansible.builtin.import_tasks: validate.yml
+
+- name: Execute Terraform provision
+  ansible.builtin.import_tasks: provision.yml
+  when: terraform_action == 'provision'
+
+- name: Execute Terraform destroy
+  ansible.builtin.import_tasks: destroy.yml
+  when: terraform_action == 'destroy'

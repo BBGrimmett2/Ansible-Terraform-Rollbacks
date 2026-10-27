@@ -1,0 +1,13 @@
+---
+- name: Destroy AWS Infrastructure with Terraform (Rollback)
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Execute Terraform destroy
+      ansible.builtin.import_role:
+        name: terraform_executor
+        tasks_from: destroy
+      vars:
+        terraform_action: destroy
+        terraform_dir: "{{ playbook_dir }}/../terraform"

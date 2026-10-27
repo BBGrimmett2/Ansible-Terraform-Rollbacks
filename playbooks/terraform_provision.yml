@@ -1,0 +1,28 @@
+---
+- name: Provision AWS Infrastructure with Terraform
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Execute Terraform provision
+      ansible.builtin.import_role:
+        name: terraform_executor
+        tasks_from: provision
+      vars:
+        terraform_action: provision
+        terraform_dir: "{{ playbook_dir }}/../terraform"
+        terraform_extra_vars:
+          simulate_tf_failure: "{{ simulate_tf_failure | default(false) }}"
+          aws_region: "{{ aws_region | default('us-east-1') }}"
+          instance_type: "{{ instance_type | default('t3.micro') }}"
+
+    - name: Register Terraform outputs as workflow artifacts
+      ansible.builtin.set_stats:
+        data:
+          instance_id: "{{ terraform_outputs.instance_id.value | default('') }}"
+          instance_public_ip: "{{ terraform_outputs.instance_public_ip.value | default('') }}"
+          vpc_id: "{{ terraform_outputs.vpc_id.value | default('') }}"
+          subnet_id: "{{ terraform_outputs.subnet_id.value | default('') }}"
+          security_group_id: "{{ terraform_outputs.security_group_id.value | default('') }}"
+          availability_zone: "{{ terraform_outputs.availability_zone.value | default('') }}"
+      when: terraform_outputs is defined

@@ -1,0 +1,27 @@
+---
+- name: Configure AWS Resources
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Configure provisioned resources
+      block:
+        - name: Apply configuration
+          ansible.builtin.import_role:
+            name: aws_resource_config
+            tasks_from: configure
+          vars:
+            simulate_config_failure: "{{ simulate_config_failure | default(false) }}"
+            aws_instance_id: "{{ instance_id | default('') }}"
+            aws_instance_ip: "{{ instance_ip | default('') }}"
+            aws_vpc_id: "{{ vpc_id | default('') }}"
+            aws_subnet_id: "{{ subnet_id | default('') }}"
+
+      rescue:
+        - name: Configuration failed - workflow will trigger rollback
+          ansible.builtin.debug:
+            msg: "Configuration failed. Terraform destroy will be triggered by workflow."
+
+        - name: Fail to trigger workflow rollback
+          ansible.builtin.fail:
+            msg: "Configuration failure detected - initiating infrastructure rollback"

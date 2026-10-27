@@ -128,3 +128,44 @@ context/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# =============================================================================
+# Terraform Artifacts
+# =============================================================================
+
+# Local Terraform state files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terraform plan files
+*.tfplan
+tfplan
+
+# Terraform variable files (may contain secrets)
+terraform.tfvars
+*.auto.tfvars
+
+# Terraform directory
+.terraform/
+.terraform.lock.hcl
+
+# Terraform crash log files
+crash.log
+crash.*.log
+
+# =============================================================================
+# Secrets and Credentials (NEVER COMMIT)
+# =============================================================================
+
+# Ansible Vault files (unless encrypted, keep unencrypted vault.yml out)
+vault.yml
+
+# AWS credentials
+.aws/
+*.pem
+*.key
+
+# Environment files
+.env
+.env.*

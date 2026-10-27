@@ -1,0 +1,31 @@
+---
+# Ansible Vault — encrypt this file before committing:
+#   ansible-vault encrypt vault.yml
+#
+# To edit in place after encryption:
+#   ansible-vault edit vault.yml
+#
+# To run the configure_aap playbook with vault:
+#   ansible-playbook playbooks/configure_aap.yml -e @vault.yml --ask-vault-pass
+#   ansible-playbook playbooks/configure_aap.yml -e @vault.yml --vault-password-file .vault_pass
+
+# --- AAP Configuration ---
+vault_aap_hostname: "aap-controller.example.com"         # e.g. aap.example.com
+vault_aap_token: "REDACTED_AAP_TOKEN"            # AAP personal access token or service account token
+
+# AAP Controller API credentials (for configure_aap.yml playbook)
+vault_aap_controller_host: "https://aap-controller.example.com"
+vault_aap_controller_username: "admin"
+vault_aap_controller_password: "REDACTED_AAP_PASSWORD"
+
+# --- AWS Credentials ---
+vault_aws_access_key_id: "REDACTED_AWS_ACCESS_KEY"
+vault_aws_secret_access_key: "REDACTED_AWS_SECRET_KEY"
+
+# --- Git/SCM Credentials ---
+vault_github_ssh_key: |
+  -----BEGIN OPENSSH PRIVATE KEY-----
+  REDACTED_SSH_PRIVATE_KEY_CONTENT
+  -----END OPENSSH PRIVATE KEY-----
+
+# --- Other Project Secrets ---

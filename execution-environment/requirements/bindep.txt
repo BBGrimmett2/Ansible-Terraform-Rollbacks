@@ -1,0 +1,3 @@
+# System dependencies for Terraform Rollback Demo
+terraform [platform:rpm]
+unzip [platform:rpm]

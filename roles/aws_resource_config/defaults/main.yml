@@ -1,0 +1,21 @@
+---
+# Defaults for aws_resource_config role
+
+# AWS resource identifiers (typically from Terraform outputs)
+aws_instance_id: ""
+aws_instance_ip: ""
+aws_vpc_id: ""
+aws_subnet_id: ""
+
+# Simulate configuration failure for demo purposes
+simulate_config_failure: false
+
+# Configuration tasks to perform
+config_tasks:
+  - "Initialize system packages"
+  - "Configure security settings"
+  - "Deploy application files"
+  - "Start application services"
+
+# Rollback behavior
+rollback_on_failure: true

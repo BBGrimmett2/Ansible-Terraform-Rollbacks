@@ -1,0 +1,56 @@
+---
+# Configuration tasks (using debug statements for demo)
+
+- name: Configure AWS resources
+  block:
+    - name: Display configuration start
+      ansible.builtin.debug:
+        msg:
+          - "=== Starting AWS Resource Configuration ==="
+          - "Target Instance: {{ aws_instance_id | default('N/A') }}"
+          - "Target IP: {{ aws_instance_ip | default('N/A') }}"
+
+    - name: Execute configuration tasks
+      ansible.builtin.debug:
+        msg: "Executing: {{ item }}"
+      loop: "{{ config_tasks }}"
+      loop_control:
+        label: "{{ item }}"
+
+    - name: Simulate configuration work
+      ansible.builtin.debug:
+        msg:
+          - "Configuration task completed successfully"
+          - "In a real scenario, this would:"
+          - "  - SSH to {{ aws_instance_ip | default('instance') }}"
+          - "  - Install required packages"
+          - "  - Deploy application files"
+          - "  - Configure services"
+          - "  - Verify application health"
+
+    - name: Check for simulated failure condition
+      ansible.builtin.fail:
+        msg: "SIMULATED FAILURE: Configuration failed (simulate_config_failure=true)"
+      when: simulate_config_failure | bool
+
+    - name: Configuration completed successfully
+      ansible.builtin.debug:
+        msg:
+          - "=== Configuration Completed Successfully ==="
+          - "All tasks executed without errors"
+          - "Resources are ready for use"
+
+  rescue:
+    - name: Configuration failure detected
+      ansible.builtin.debug:
+        msg:
+          - "!!! Configuration Failed !!!"
+          - "Initiating configuration rollback..."
+
+    - name: Execute rollback tasks
+      ansible.builtin.import_tasks: rollback.yml
+      when: rollback_on_failure | bool
+
+    - name: Re-raise failure to trigger workflow rollback
+      ansible.builtin.fail:
+        msg: "Configuration failed. Workflow will trigger infrastructure rollback (Terraform destroy)."

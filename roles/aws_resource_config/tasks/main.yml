@@ -1,0 +1,8 @@
+---
+# Main orchestration tasks for aws_resource_config role
+
+- name: Validate inputs
+  ansible.builtin.import_tasks: validate.yml
+
+- name: Execute configuration tasks
+  ansible.builtin.import_tasks: configure.yml

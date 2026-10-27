@@ -1,0 +1,71 @@
+---
+# Argument specs for aws_resource_config role
+argument_specs:
+  main:
+    short_description: Configure AWS resources provisioned by Terraform
+    description:
+      - Configures EC2 instances and related AWS resources
+      - Uses debug statements for demo simplicity
+      - Supports failure simulation for rollback testing
+
+    options:
+      aws_instance_id:
+        type: str
+        required: false
+        description: EC2 instance ID from Terraform output
+
+      aws_instance_ip:
+        type: str
+        required: false
+        description: Public IP address from Terraform output
+
+      aws_vpc_id:
+        type: str
+        required: false
+        description: VPC ID from Terraform output
+
+      aws_subnet_id:
+        type: str
+        required: false
+        description: Subnet ID from Terraform output
+
+      simulate_config_failure:
+        type: bool
+        required: false
+        description: Set to true to simulate a configuration failure
+
+      config_tasks:
+        type: list
+        required: false
+        description: List of configuration tasks to display
+
+      rollback_on_failure:
+        type: bool
+        required: false
+        description: Whether to execute rollback tasks on failure
+
+  configure:
+    short_description: Apply configuration to AWS resources
+    description:
+      - Main configuration entry point
+      - Executes configuration tasks (debug statements for demo)
+      - Handles failure simulation
+
+    options:
+      simulate_config_failure:
+        type: bool
+        required: false
+        description: Set to true to test configuration failure rollback
+
+  rollback:
+    short_description: Rollback configuration changes
+    description:
+      - Reverses configuration changes
+      - Uses debug statements for demo purposes
+      - Called when configuration fails
+
+    options:
+      aws_instance_id:
+        type: str
+        required: false
+        description: EC2 instance ID to rollback

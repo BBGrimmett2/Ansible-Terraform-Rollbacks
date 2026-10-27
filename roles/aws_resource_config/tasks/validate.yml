@@ -1,0 +1,28 @@
+---
+# Validation tasks for aws_resource_config role
+
+- name: Validate simulate_config_failure is boolean
+  ansible.builtin.assert:
+    that:
+      - simulate_config_failure is defined
+      - simulate_config_failure is boolean
+    fail_msg: "simulate_config_failure must be a boolean value"
+    success_msg: "Configuration failure simulation: {{ simulate_config_failure }}"
+
+- name: Validate config_tasks is a list
+  ansible.builtin.assert:
+    that:
+      - config_tasks is defined
+      - config_tasks is iterable
+      - config_tasks | length > 0
+    fail_msg: "config_tasks must be a non-empty list"
+    success_msg: "Found {{ config_tasks | length }} configuration task(s) to execute"
+
+- name: Display configuration parameters
+  ansible.builtin.debug:
+    msg:
+      - "AWS Instance ID: {{ aws_instance_id | default('Not provided') }}"
+      - "AWS Instance IP: {{ aws_instance_ip | default('Not provided') }}"
+      - "VPC ID: {{ aws_vpc_id | default('Not provided') }}"
+      - "Subnet ID: {{ aws_subnet_id | default('Not provided') }}"
+      - "Simulate Failure: {{ simulate_config_failure }}"

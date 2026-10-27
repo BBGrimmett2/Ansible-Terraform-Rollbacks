@@ -1,0 +1,7 @@
+---
+# AAP Organizations configuration
+aap_organizations:
+  - name: "{{ aap_organization_name }}"
+    description: Organization for Brian's Demos and testing
+    galaxy_credentials:
+      - Ansible Galaxy

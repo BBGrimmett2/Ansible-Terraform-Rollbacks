@@ -1,0 +1,15 @@
+---
+# Common variables used across all AAP configuration files
+# This file is loaded by playbooks/configure_aap.yml
+
+# Organization name - used throughout all AAP resources
+aap_organization_name: BGrimmett Demos
+
+# Default execution environment for jobs
+aap_default_ee_name: Terraform Execution Environment
+
+# Default inventory for localhost execution
+aap_localhost_inventory_name: Localhost Inventory
+
+# Project name
+aap_project_name: Terraform Rollback Demo

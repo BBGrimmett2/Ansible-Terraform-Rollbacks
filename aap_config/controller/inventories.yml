@@ -1,0 +1,27 @@
+---
+# AAP Inventories configuration
+controller_inventories:
+  - name: "{{ aap_localhost_inventory_name }}"
+    organization: "{{ aap_organization_name }}"
+    description: Localhost inventory for Terraform execution
+    variables:
+      ansible_connection: local
+      ansible_python_interpreter: "{{ ansible_playbook_python }}"
+
+  - name: AWS Dynamic Inventory
+    organization: "{{ aap_organization_name }}"
+    description: AWS EC2 dynamic inventory for provisioned resources
+    variables:
+      plugin: amazon.aws.aws_ec2
+      regions:
+        - us-east-1
+      filters:
+        tag:Project: terraform-rollback-demo
+        instance-state-name: running
+      keyed_groups:
+        - key: tags.Name
+          prefix: tag_Name
+        - key: placement.availability_zone
+          prefix: az
+      compose:
+        ansible_host: public_ip_address

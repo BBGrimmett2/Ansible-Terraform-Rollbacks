@@ -1,0 +1,16 @@
+---
+# AAP Projects configuration
+controller_projects:
+  - name: "{{ aap_project_name }}"
+    organization: "{{ aap_organization_name }}"
+    scm_type: git
+    scm_url: https://github.com/yourorg/Ansible-Terraform-Rollbacks.git
+    scm_credential: GitHub SCM Credential
+    scm_branch: main
+    scm_update_on_launch: true
+    scm_delete_on_update: true
+    scm_clean: true
+    description: Terraform and Ansible automated rollback demonstration project
+    default_environment: "{{ aap_default_ee_name }}"
+    wait: true
+    update_project: true

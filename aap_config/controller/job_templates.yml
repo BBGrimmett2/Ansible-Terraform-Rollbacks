@@ -1,0 +1,58 @@
+---
+# AAP Job Templates configuration
+controller_templates:
+  - name: Terraform Provision Infrastructure
+    organization: "{{ aap_organization_name }}"
+    project: "{{ aap_project_name }}"
+    playbook: playbooks/terraform_provision.yml
+    inventory: "{{ aap_localhost_inventory_name }}"
+    execution_environment: "{{ aap_default_ee_name }}"
+    credentials:
+      - AWS Demo Credentials
+    ask_variables_on_launch: true
+    extra_vars:
+      simulate_tf_failure: false
+      aws_region: us-east-1
+      instance_type: t3.micro
+    job_type: run
+    verbosity: 1
+    description: Provision AWS infrastructure (VPC, Subnet, EC2) using Terraform
+
+  - name: Terraform Destroy Infrastructure
+    organization: "{{ aap_organization_name }}"
+    project: "{{ aap_project_name }}"
+    playbook: playbooks/terraform_destroy.yml
+    inventory: "{{ aap_localhost_inventory_name }}"
+    execution_environment: "{{ aap_default_ee_name }}"
+    credentials:
+      - AWS Demo Credentials
+    job_type: run
+    verbosity: 1
+    description: Destroy all provisioned AWS infrastructure (rollback operation)
+
+  - name: Configure AWS Resources
+    organization: "{{ aap_organization_name }}"
+    project: "{{ aap_project_name }}"
+    playbook: playbooks/configure_resources.yml
+    inventory: "{{ aap_localhost_inventory_name }}"
+    execution_environment: "{{ aap_default_ee_name }}"
+    credentials:
+      - AWS Demo Credentials
+    ask_variables_on_launch: true
+    extra_vars:
+      simulate_config_failure: false
+    job_type: run
+    verbosity: 1
+    description: Configure provisioned AWS resources (uses debug statements for demo)
+
+  - name: Configure AAP Resources
+    organization: "{{ aap_organization_name }}"
+    project: "{{ aap_project_name }}"
+    playbook: playbooks/configure_aap.yml
+    inventory: "{{ aap_localhost_inventory_name }}"
+    execution_environment: "{{ aap_default_ee_name }}"
+    credentials:
+      - AAP Controller Credential
+    job_type: run
+    verbosity: 1
+    description: Apply AAP configuration as code (creates this job template and all AAP resources)

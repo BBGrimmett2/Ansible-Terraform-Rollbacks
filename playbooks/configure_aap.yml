@@ -5,6 +5,12 @@
   gather_facts: false
 
   tasks:
+    - name: Load common AAP variables
+      ansible.builtin.include_vars:
+        file: "{{ playbook_dir }}/../aap_config/common_vars.yml"
+      tags:
+        - always
+
     - name: Load all AAP configuration variables
       ansible.builtin.include_vars:
         dir: "{{ playbook_dir }}/../aap_config"

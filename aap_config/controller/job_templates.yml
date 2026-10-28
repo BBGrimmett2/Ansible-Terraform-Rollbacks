@@ -53,6 +53,109 @@ controller_templates:
     labels:
       - Terraform
 
+  # Slack Notification Job Templates
+  - name: Automated Rollbacks | Notify Provision Success
+    organization: "{{ aap_organization_name }}"
+    project: "{{ aap_project_name }}"
+    playbook: playbooks/notify_provision_success.yml
+    inventory: "{{ aap_localhost_inventory_name }}"
+    execution_environment: "{{ aap_default_ee_name }}"
+    credentials:
+      - Slack Webhook Credential
+    ask_variables_on_launch: true
+    extra_vars:
+      vpc_id: ""
+      subnet_id: ""
+      instance_id: ""
+      instance_public_ip: ""
+      security_group_id: ""
+      availability_zone: ""
+      aws_region: us-east-1
+      environment: demo
+    job_type: run
+    verbosity: 0
+    description: Send Slack notification when infrastructure provisioning succeeds
+    labels:
+      - Terraform
+
+  - name: Automated Rollbacks | Notify Provision Failure
+    organization: "{{ aap_organization_name }}"
+    project: "{{ aap_project_name }}"
+    playbook: playbooks/notify_provision_failure.yml
+    inventory: "{{ aap_localhost_inventory_name }}"
+    execution_environment: "{{ aap_default_ee_name }}"
+    credentials:
+      - Slack Webhook Credential
+    ask_variables_on_launch: true
+    extra_vars:
+      aws_region: us-east-1
+      environment: demo
+    job_type: run
+    verbosity: 0
+    description: Send Slack notification when infrastructure provisioning fails
+    labels:
+      - Notifications
+
+  - name: Automated Rollbacks | Notify Configuration Failure
+    organization: "{{ aap_organization_name }}"
+    project: "{{ aap_project_name }}"
+    playbook: playbooks/notify_config_failure.yml
+    inventory: "{{ aap_localhost_inventory_name }}"
+    execution_environment: "{{ aap_default_ee_name }}"
+    credentials:
+      - Slack Webhook Credential
+    ask_variables_on_launch: true
+    extra_vars:
+      vpc_id: ""
+      subnet_id: ""
+      instance_id: ""
+      instance_public_ip: ""
+      aws_region: us-east-1
+      environment: demo
+    job_type: run
+    verbosity: 0
+    description: Send Slack notification when resource configuration fails
+    labels:
+      - Notifications
+
+  - name: Automated Rollbacks | Notify Rollback Complete
+    organization: "{{ aap_organization_name }}"
+    project: "{{ aap_project_name }}"
+    playbook: playbooks/notify_rollback_complete.yml
+    inventory: "{{ aap_localhost_inventory_name }}"
+    execution_environment: "{{ aap_default_ee_name }}"
+    credentials:
+      - Slack Webhook Credential
+    ask_variables_on_launch: true
+    extra_vars:
+      aws_region: us-east-1
+      environment: demo
+      rollback_reason: "Provision or configuration failure"
+    job_type: run
+    verbosity: 0
+    description: Send Slack notification when infrastructure rollback completes
+    labels:
+      - Notifications
+
+  - name: Automated Rollbacks | Send Generic Notification
+    organization: "{{ aap_organization_name }}"
+    project: "{{ aap_project_name }}"
+    playbook: playbooks/notify_generic.yml
+    inventory: "{{ aap_localhost_inventory_name }}"
+    execution_environment: "{{ aap_default_ee_name }}"
+    credentials:
+      - Slack Webhook Credential
+    ask_variables_on_launch: true
+    extra_vars:
+      custom_title: "Ansible Notification"
+      custom_status: info
+      custom_message: "Automation job completed"
+    job_type: run
+    verbosity: 0
+    description: Send a custom Slack notification with user-defined content
+    labels:
+      - Notifications
+
   # - name: Configure AAP Resources
   #   organization: "{{ aap_organization_name }}"
   #   project: "{{ aap_project_name }}"

@@ -1,0 +1,129 @@
+---
+# Main tasks for slack_notification role
+
+- name: Send Slack notification
+  block:
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - slack_webhook_url | length > 0
+          - notification_message | length > 0
+        fail_msg: "slack_webhook_url and notification_message are required"
+        success_msg: "Required variables validated"
+
+    - name: Set status color
+      ansible.builtin.set_fact:
+        slack_color: >-
+          {% if notification_status == 'success' %}good
+          {% elif notification_status == 'warning' %}warning
+          {% elif notification_status == 'error' %}danger
+          {% else %}#439FE0
+          {% endif %}
+
+    - name: Set status icon
+      ansible.builtin.set_fact:
+        slack_status_icon: >-
+          {% if notification_status == 'success' %}:white_check_mark:
+          {% elif notification_status == 'warning' %}:warning:
+          {% elif notification_status == 'error' %}:x:
+          {% else %}:information_source:
+          {% endif %}
+
+    - name: Build infrastructure details text
+      ansible.builtin.set_fact:
+        infra_text: |
+          {% if infrastructure_details | length > 0 %}
+          *Infrastructure Details:*
+          {% for key, value in infrastructure_details.items() %}
+          • {{ key | replace('_', ' ') | title }}: `{{ value }}`
+          {% endfor %}
+          {% endif %}
+      when: infrastructure_details | length > 0
+
+    - name: Build notification details text
+      ansible.builtin.set_fact:
+        details_text: |
+          {% if notification_details | length > 0 %}
+          {% for detail in notification_details %}
+          • {{ detail }}
+          {% endfor %}
+          {% endif %}
+      when: notification_details | length > 0
+
+    - name: Build Slack message payload
+      ansible.builtin.set_fact:
+        slack_payload:
+          channel: "{{ slack_channel }}"
+          username: "{{ slack_username }}"
+          icon_emoji: "{{ slack_icon_emoji }}"
+          attachments:
+            - color: "{{ slack_color }}"
+              title: "{{ slack_status_icon }} {{ notification_title }}"
+              title_link: "{{ awx_job_url }}"
+              text: "{{ notification_message }}"
+              fields:
+                - title: "Job Template"
+                  value: "{{ awx_job_template_name }}"
+                  short: true
+                - title: "Job ID"
+                  value: "{{ awx_job_id }}"
+                  short: true
+              footer: "Ansible Automation Platform"
+              footer_icon: "https://www.ansible.com/favicon.ico"
+              ts: "{{ ansible_date_time.epoch }}"
+              mrkdwn_in:
+                - text
+                - fields
+
+    - name: Add notification details to payload
+      ansible.builtin.set_fact:
+        slack_payload: >-
+          {{ slack_payload | combine({
+            'attachments': [
+              slack_payload.attachments[0] | combine({
+                'text': slack_payload.attachments[0].text + '\n\n' + details_text
+              })
+            ]
+          }, recursive=true) }}
+      when:
+        - notification_details is defined
+        - notification_details | length > 0
+
+    - name: Add infrastructure details to payload
+      ansible.builtin.set_fact:
+        slack_payload: >-
+          {{ slack_payload | combine({
+            'attachments': [
+              slack_payload.attachments[0] | combine({
+                'text': slack_payload.attachments[0].text + '\n\n' + infra_text
+              })
+            ]
+          }, recursive=true) }}
+      when:
+        - infrastructure_details is defined
+        - infrastructure_details | length > 0
+
+    - name: Send notification to Slack
+      ansible.builtin.uri:
+        url: "{{ slack_webhook_url }}"
+        method: POST
+        body_format: json
+        body: "{{ slack_payload }}"
+        status_code: 200
+        headers:
+          Content-Type: "application/json"
+      register: slack_response
+      changed_when: false
+
+    - name: Display notification result
+      ansible.builtin.debug:
+        msg: "Slack notification sent successfully"
+      when: slack_response.status == 200
+
+  rescue:
+    - name: Display Slack notification failure
+      ansible.builtin.debug:
+        msg:
+          - "Failed to send Slack notification"
+          - "Error: {{ ansible_failed_result.msg | default('Unknown error') }}"
+      failed_when: false

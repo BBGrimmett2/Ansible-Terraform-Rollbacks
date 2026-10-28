@@ -1,0 +1,42 @@
+---
+argument_specs:
+  main:
+    short_description: Send Slack notification
+    description:
+      - Sends formatted notification messages to Slack via webhook
+      - Supports different message types (info, success, warning, error)
+      - Includes AAP job context and infrastructure details
+    options:
+      slack_webhook_url:
+        type: str
+        required: true
+        description: Slack incoming webhook URL
+      notification_title:
+        type: str
+        required: false
+        description: Title of the notification message
+      notification_status:
+        type: str
+        required: false
+        choices:
+          - info
+          - success
+          - warning
+          - error
+        description: Status type that determines message color
+      notification_message:
+        type: str
+        required: true
+        description: Main notification message body
+      notification_details:
+        type: list
+        required: false
+        description: List of additional detail lines to include
+      slack_channel:
+        type: str
+        required: false
+        description: Slack channel to post to (overrides webhook default)
+      infrastructure_details:
+        type: dict
+        required: false
+        description: Dictionary of infrastructure details (VPC ID, Instance ID, etc.)

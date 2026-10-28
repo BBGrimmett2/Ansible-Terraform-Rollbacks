@@ -1,0 +1,24 @@
+---
+# Default variables for slack_notification role
+
+# Slack webhook URL (should be overridden via AAP credential or extra vars)
+slack_webhook_url: ""
+
+# Notification message defaults
+slack_channel: "#ansible-notifications"
+slack_username: "Ansible Automation Platform"
+slack_icon_emoji: ":ansible:"
+
+# Message content
+notification_title: "Ansible Job Notification"
+notification_status: "info"  # info, success, warning, error
+notification_message: ""
+notification_details: []
+
+# Job context (populated by AAP automatically)
+awx_job_id: "{{ tower_job_id | default('N/A') }}"
+awx_job_template_name: "{{ tower_job_template_name | default('N/A') }}"
+awx_job_url: "{{ tower_job_launch_url | default('') }}"
+
+# Infrastructure details (optional)
+infrastructure_details: {}

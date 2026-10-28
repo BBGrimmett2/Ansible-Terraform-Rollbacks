@@ -1,0 +1,15 @@
+---
+- name: Send Generic Slack Notification
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+    - name: Send generic notification
+      ansible.builtin.import_role:
+        name: slack_notification
+      vars:
+        notification_title: "{{ custom_title | default('Ansible Notification') }}"
+        notification_status: "{{ custom_status | default('info') }}"
+        notification_message: "{{ custom_message | default('Automation job completed') }}"
+        notification_details: "{{ custom_details | default([]) }}"
+        infrastructure_details: "{{ custom_infrastructure | default({}) }}"

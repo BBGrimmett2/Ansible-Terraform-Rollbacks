@@ -1,0 +1,26 @@
+---
+- name: Send Slack Notification - Provision Success
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+    - name: Send provision success notification
+      ansible.builtin.import_role:
+        name: slack_notification
+      vars:
+        notification_title: "Infrastructure Provisioning Complete"
+        notification_status: "success"
+        notification_message: |
+          AWS infrastructure has been successfully provisioned and configured.
+          All resources are ready for use.
+        notification_details:
+          - "Region: {{ aws_region | default('us-east-1') }}"
+          - "Environment: {{ environment | default('demo') }}"
+          - "Provisioned at: {{ ansible_date_time.iso8601 }}"
+        infrastructure_details:
+          vpc_id: "{{ vpc_id | default('N/A') }}"
+          subnet_id: "{{ subnet_id | default('N/A') }}"
+          instance_id: "{{ instance_id | default('N/A') }}"
+          instance_public_ip: "{{ instance_public_ip | default('N/A') }}"
+          security_group_id: "{{ security_group_id | default('N/A') }}"
+          availability_zone: "{{ availability_zone | default('N/A') }}"

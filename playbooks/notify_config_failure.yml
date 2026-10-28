@@ -1,0 +1,25 @@
+---
+- name: Send Slack Notification - Configuration Failure
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+    - name: Send configuration failure notification
+      ansible.builtin.import_role:
+        name: slack_notification
+      vars:
+        notification_title: "Resource Configuration Failed"
+        notification_status: "error"
+        notification_message: |
+          Infrastructure was provisioned successfully, but resource configuration failed.
+          Automatic rollback has been initiated to destroy all provisioned infrastructure.
+        notification_details:
+          - "Region: {{ aws_region | default('us-east-1') }}"
+          - "Environment: {{ environment | default('demo') }}"
+          - "Failed at: {{ ansible_date_time.iso8601 }}"
+          - "Action: Full infrastructure rollback triggered"
+        infrastructure_details:
+          vpc_id: "{{ vpc_id | default('N/A') }}"
+          subnet_id: "{{ subnet_id | default('N/A') }}"
+          instance_id: "{{ instance_id | default('N/A') }}"
+          instance_public_ip: "{{ instance_public_ip | default('N/A') }}"

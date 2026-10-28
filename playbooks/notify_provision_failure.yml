@@ -1,0 +1,21 @@
+---
+- name: Send Slack Notification - Provision Failure
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+    - name: Send provision failure notification
+      ansible.builtin.import_role:
+        name: slack_notification
+      vars:
+        notification_title: "Infrastructure Provisioning Failed"
+        notification_status: "error"
+        notification_message: |
+          AWS infrastructure provisioning has failed.
+          Automatic rollback has been initiated to clean up any partial resources.
+        notification_details:
+          - "Region: {{ aws_region | default('us-east-1') }}"
+          - "Environment: {{ environment | default('demo') }}"
+          - "Failed at: {{ ansible_date_time.iso8601 }}"
+          - "Action: Rollback workflow triggered"
+        infrastructure_details: "{{ failed_resources | default({}) }}"

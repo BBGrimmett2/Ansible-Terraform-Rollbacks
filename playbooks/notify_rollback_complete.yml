@@ -1,0 +1,20 @@
+---
+- name: Send Slack Notification - Rollback Complete
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+    - name: Send rollback completion notification
+      ansible.builtin.import_role:
+        name: slack_notification
+      vars:
+        notification_title: "Infrastructure Rollback Complete"
+        notification_status: "warning"
+        notification_message: |
+          All provisioned AWS resources have been destroyed.
+          Environment has been returned to pre-provision state.
+        notification_details:
+          - "Region: {{ aws_region | default('us-east-1') }}"
+          - "Environment: {{ environment | default('demo') }}"
+          - "Rollback completed at: {{ ansible_date_time.iso8601 }}"
+          - "Reason: {{ rollback_reason | default('Provision or configuration failure') }}"

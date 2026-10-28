@@ -1,0 +1,4 @@
+---
+controller_labels:
+  - name: Terraform
+    organization: "{{ aap_organization_name }}"

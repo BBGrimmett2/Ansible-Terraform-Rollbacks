@@ -1,7 +1,7 @@
 ---
 # AAP Job Templates configuration
 controller_templates:
-  - name: Terraform Provision Infrastructure
+  - name: Automated Rollbacks | Terraform Provision Infrastructure
     organization: "{{ aap_organization_name }}"
     project: "{{ aap_project_name }}"
     playbook: playbooks/terraform_provision.yml
@@ -17,8 +17,11 @@ controller_templates:
     job_type: run
     verbosity: 1
     description: Provision AWS infrastructure (VPC, Subnet, EC2) using Terraform
+    labels:
+      - Terraform
 
-  - name: Terraform Destroy Infrastructure
+
+  - name: Automated Rollbacks | Terraform Destroy Infrastructure
     organization: "{{ aap_organization_name }}"
     project: "{{ aap_project_name }}"
     playbook: playbooks/terraform_destroy.yml
@@ -29,8 +32,11 @@ controller_templates:
     job_type: run
     verbosity: 1
     description: Destroy all provisioned AWS infrastructure (rollback operation)
+    labels:
+      - Terraform
 
-  - name: Configure AWS Resources
+
+  - name: Automated Rollbacks | Configure AWS Resources
     organization: "{{ aap_organization_name }}"
     project: "{{ aap_project_name }}"
     playbook: playbooks/configure_resources.yml
@@ -44,6 +50,8 @@ controller_templates:
     job_type: run
     verbosity: 1
     description: Configure provisioned AWS resources (uses debug statements for demo)
+    labels:
+      - Terraform
 
   # - name: Configure AAP Resources
   #   organization: "{{ aap_organization_name }}"

@@ -7,14 +7,13 @@ collections:
   - name: community.aws
     version: ">=8.0.0"
 
-  - name: infra.aap_configuration
-    version: ">=2.8.0"
+  # - name: infra.aap_configuration
+  #   version: ">=2.8.0"
 
-  - name: ansible.controller
-    version: ">=4.8.2"
+  # - name: ansible.controller
+  #   version: ">=4.8.2"
 
-  - name: ansible.eda
-    version: ">=2.12.1"
+  # ansible.eda removed - not needed for Terraform rollback demo
 
   - name: cloud.terraform
     version: ">=3.0.0"

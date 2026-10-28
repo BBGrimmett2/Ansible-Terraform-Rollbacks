@@ -45,14 +45,14 @@ controller_templates:
     verbosity: 1
     description: Configure provisioned AWS resources (uses debug statements for demo)
 
-  - name: Configure AAP Resources
-    organization: "{{ aap_organization_name }}"
-    project: "{{ aap_project_name }}"
-    playbook: playbooks/configure_aap.yml
-    inventory: "{{ aap_localhost_inventory_name }}"
-    execution_environment: "{{ aap_default_ee_name }}"
-    credentials:
-      - AAP Controller Credential
-    job_type: run
-    verbosity: 1
-    description: Apply AAP configuration as code (creates this job template and all AAP resources)
+  # - name: Configure AAP Resources
+  #   organization: "{{ aap_organization_name }}"
+  #   project: "{{ aap_project_name }}"
+  #   playbook: playbooks/configure_aap.yml
+  #   inventory: "{{ aap_localhost_inventory_name }}"
+  #   execution_environment: "{{ aap_default_ee_name }}"
+  #   credentials:
+  #     - AAP Controller Credential
+  #   job_type: run
+  #   verbosity: 1
+  #   description: Apply AAP configuration as code (creates this job template and all AAP resources)

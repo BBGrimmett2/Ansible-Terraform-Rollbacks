@@ -40,7 +40,7 @@
           {{ terraform_binary }} destroy
           {% if terraform_auto_approve %}-auto-approve{% endif %}
           {% if terraform_var_file | length > 0 %}-var-file={{ terraform_var_file }}{% endif %}
-          {% for key, value in terraform_extra_vars.items() %}-var '{{ key }}={{ value }}'{% if not loop.last %} {% endif %}{% endfor %}
+          {% for key, value in terraform_extra_vars.items() %}-var '{{ key }}={{ value | lower if value is boolean else value }}'{% if not loop.last %} {% endif %}{% endfor %}
 
     - name: Execute Terraform destroy
       ansible.builtin.command:

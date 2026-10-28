@@ -29,17 +29,12 @@
       when: tf_workspace.rc != 0
       changed_when: true
 
-    - name: Build Terraform var flags
-      ansible.builtin.set_fact:
-        tf_var_flags: "{{ terraform_extra_vars | dict2items | map('regex_replace', '^(.*)$', '-var \\1.key=\\1.value') | join(' ') }}"
-      when: terraform_extra_vars | length > 0
-
     - name: Build Terraform plan command
       ansible.builtin.set_fact:
         tf_plan_cmd: >-
           {{ terraform_binary }} plan
           {% if terraform_var_file | length > 0 %}-var-file={{ terraform_var_file }}{% endif %}
-          {% for key, value in terraform_extra_vars.items() %}-var '{{ key }}={{ value }}'{% if not loop.last %} {% endif %}{% endfor %}
+          {% for key, value in terraform_extra_vars.items() %}-var '{{ key }}={{ value | lower if value is boolean else value }}'{% if not loop.last %} {% endif %}{% endfor %}
           -out=tfplan
 
     - name: Build Terraform apply command

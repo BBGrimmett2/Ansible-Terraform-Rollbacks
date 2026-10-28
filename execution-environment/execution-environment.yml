@@ -9,100 +9,71 @@ images:
   # Base image - choose the appropriate image for your needs
   base_image:
     name: registry.redhat.io/ansible-automation-platform-26/ee-minimal-rhel9:latest
-    # Other common options:
-    # name: registry.redhat.io/ansible-automation-platform-26/ee-supported-rhel9:latest
-    # name: quay.io/ansible/creator-ee:latest
-    # name: quay.io/ansible/ansible-runner:latest
-
-  # Optional: Override the builder image used for multi-stage builds
-  # builder_image:
-  #   name: registry.redhat.io/ansible-automation-platform-26/ansible-builder-rhel9:latest
 
 # Dependencies to install in the execution environment
 dependencies:
   # Ansible Galaxy requirements (collections and roles)
-  galaxy: requirements/requirements.yml
+  galaxy:
+    collections:
+      - name: amazon.aws
+        version: ">=8.0.0"
 
-  # Python package requirements
+      - name: community.aws
+        version: ">=8.0.0"
+
+      - name: infra.aap_configuration
+        version: ">=2.8.0"
+
+      - name: ansible.controller
+        version: ">=4.8.2"
+
+      # ansible.eda removed - not needed for Terraform rollback demo
+      # It requires gssapi compilation which adds build complexity
+
+      - name: cloud.terraform
+        version: ">=3.0.0"
+
+  # Python package requirements file
   python: requirements/requirements.txt
-  # Alternative: specify packages inline
-  # python:
-  #   - requests>=2.28.0
-  #   - jinja2>=3.1.0
-  #   - netaddr
 
   # System-level dependencies (RPM packages, etc.)
-  system: requirements/bindep.txt
-  # Alternative: specify packages inline
-  # system:
-  #   - git-core [platform:rpm]
-  #   - python3-devel [platform:rpm]
-  #   - gcc [compile platform:rpm]
+  system:
+    - unzip [platform:rpm]
 
 # Build options
 options:
   # Package manager to use in the container
   package_manager_path: /usr/bin/microdnf
-  # Other options:
-  # package_manager_path: /usr/bin/dnf
-  # package_manager_path: /usr/bin/yum
 
-  # Container runtime options
-  # container_init:
-  #   package_pip: dumb-init==1.2.5
-  #   entrypoint: '["dumb-init"]'
-  #   cmd: '["bash"]'
+additional_build_files:
+  - src: files/ansible.cfg
+    dest: configs
 
-  # Relax password requirements for user
-  # relax_passwd_req: true
+additional_build_steps:
+  prepend_base:
+    - RUN /usr/bin/python3 -m ensurepip --upgrade || /usr/bin/python3 -m ensurepip
+    - RUN /usr/bin/python3 -m pip install --upgrade pip setuptools wheel
 
-  # Skip Ansible installation (if base image already has it)
-  # skip_ansible_check: true
+  prepend_galaxy:
+    - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
 
-  # User configuration
-  # user: 1000
+  prepend_builder:
+    - RUN /usr/bin/microdnf install -y python3-devel gcc --nodocs --setopt install_weak_deps=0 || true
+    - RUN /usr/bin/python3 -m ensurepip --upgrade || /usr/bin/python3 -m ensurepip || true
+    - RUN /usr/bin/python3 -m pip install --upgrade pip setuptools wheel || true
+    - RUN /usr/bin/microdnf install -y python3-pip || true
+    - RUN /usr/bin/python3 -m pip install pyyaml packaging bindep || true
 
-  # Working directory
-  # workdir: /runner
+  prepend_final:
+    - RUN whoami
+    - RUN cat /etc/os-release
+    - RUN /usr/bin/python3 -m ensurepip --upgrade || /usr/bin/python3 -m ensurepip
+    - RUN /usr/bin/python3 -m pip install --upgrade pip setuptools wheel
 
-# Additional custom build steps
-# These are executed during the build process at specific stages
-# additional_build_steps:
-#   # Steps to run before installing Galaxy dependencies
-#   prepend_galaxy:
-#     - RUN echo "Running before Galaxy install"
-#     - COPY custom-files /opt/custom
-#
-#   # Steps to run after installing Galaxy dependencies
-#   append_galaxy:
-#     - RUN ansible-galaxy collection list
-#
-#   # Steps to run before the final image stage
-#   prepend_final:
-#     - RUN echo "Preparing final image"
-#
-#   # Steps to run at the end of the final image
-#   append_final:
-#     - RUN chmod -R g+w /runner
-#     - COPY --from=builder /custom-tool /usr/local/bin/
-#     - RUN ln -s /usr/local/bin/custom-tool /usr/bin/custom-tool
+  append_base:
+    - RUN /usr/bin/python3 -m ensurepip --upgrade || /usr/bin/python3 -m ensurepip
+    - RUN /usr/bin/python3 -m pip install --upgrade pip setuptools wheel
 
-# Build arguments to pass to the container build
-# build_arg_defaults:
-#   # Proxy settings
-#   HTTP_PROXY: 'http://proxy.example.com:8080'
-#   HTTPS_PROXY: 'http://proxy.example.com:8080'
-#   NO_PROXY: 'localhost,127.0.0.1'
-#
-#   # Python package index
-#   PIP_INDEX_URL: 'https://pypi.org/simple'
-#
-#   # Custom build arguments
-#   CUSTOM_VAR: 'value'
-
-# Additional files to include in the build context
-# additional_build_files:
-#   - src: files/custom-script.sh
-#     dest: configs
-#   - src: files/ansible.cfg
-#     dest: configs
+  append_final:
+    # Install OpenTofu and symlink as terraform (runs after system dependencies installed)
+    - RUN ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/') && TOFU_VERSION="1.8.8" && curl -sL "https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}/tofu_${TOFU_VERSION}_linux_${ARCH}.zip" -o /tmp/tofu.zip && unzip -q /tmp/tofu.zip -d /usr/local/bin/ && rm /tmp/tofu.zip && chmod +x /usr/local/bin/tofu && ln -s /usr/local/bin/tofu /usr/local/bin/terraform && tofu version && terraform version

@@ -1,3 +1,6 @@
 # System dependencies for Terraform Rollback Demo
-terraform [platform:rpm]
+# Note: Terraform/OpenTofu is installed via custom build steps in execution-environment.yml
+# Note: python3-pip removed from here - installed via ensurepip in build steps
 unzip [platform:rpm]
+python3-devel [compile platform:rpm]
+gcc [compile platform:rpm]

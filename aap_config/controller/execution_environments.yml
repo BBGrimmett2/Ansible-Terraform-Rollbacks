@@ -2,7 +2,7 @@
 # AAP Execution Environments configuration
 controller_execution_environments:
   - name: "{{ aap_default_ee_name }}"
-    image: registry.redhat.io/ansible-automation-platform-26/ee-supported-rhel9:latest
+    image: quay.io/bgrimmet/ansible-tf-rollback-demo:2026-10-28-091054
     description: Execution environment with Terraform, AWS collections, and AAP configuration collections
     organization: "{{ aap_organization_name }}"
     pull: missing

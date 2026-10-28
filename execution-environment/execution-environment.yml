@@ -12,6 +12,8 @@ images:
 
 # Dependencies to install in the execution environment
 dependencies:
+  ansible_core:
+    package_pip: ansible-core==2.18
   # Ansible Galaxy requirements (collections and roles)
   galaxy:
     collections:
@@ -21,20 +23,24 @@ dependencies:
       - name: community.aws
         version: ">=8.0.0"
 
-      - name: infra.aap_configuration
-        version: ">=2.8.0"
-
-      - name: ansible.controller
-        version: ">=4.8.2"
-
-      # ansible.eda removed - not needed for Terraform rollback demo
-      # It requires gssapi compilation which adds build complexity
-
       - name: cloud.terraform
         version: ">=3.0.0"
 
   # Python package requirements file
-  python: requirements/requirements.txt
+  python:
+    # Python dependencies for Terraform Rollback Demo
+    # Explicitly listing all dependencies instead of relying on collection auto-detection
+
+    # Core dependencies
+    - pyyaml
+    - packaging
+    - bindep
+
+    # amazon.aws and community.aws requirements
+    - boto3>=1.38.0
+    - botocore>=1.38.0
+    - aiobotocore>=2.23.0
+
 
   # System-level dependencies (RPM packages, etc.)
   system:

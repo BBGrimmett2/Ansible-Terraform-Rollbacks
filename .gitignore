@@ -169,3 +169,4 @@ vault.yml
 # Environment files
 .env
 .env.*
+execution-environment/files/ansible.cfg
